@@ -1,4 +1,4 @@
-package com.assignment.spring;
+package com.assignment.spring.utils;
 
 public class Constants {
 

@@ -1,4 +1,4 @@
-package com.assignment.spring;
+package com.assignment.spring.weather;
 
 import org.springframework.data.repository.CrudRepository;
 
