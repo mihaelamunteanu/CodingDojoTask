@@ -6,13 +6,19 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class WeatherExceptionInfo {
 	private int code;
 	private HttpStatus status;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	
+	//without a the deserialization does not work - as it can't tell if 07 is for am or pm
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss a") 
 	private LocalDateTime timestamp = LocalDateTime.now();;
 	private String message;
 	private String debugMessage;

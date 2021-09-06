@@ -49,7 +49,7 @@ public class WeatherService {
 			weatherEntity = convertWeatherResponseToWeatherEntity(response.getBody());
 			return weatherRepository.save(weatherEntity);
 			
-		}  catch (HttpStatusCodeException httpStatusException) {
+		} catch (HttpStatusCodeException httpStatusException) {//HttpServerErrorException | HttpClientErrorException
 			ObjectMapper mapper = new ObjectMapper();
 			try {
 				WeatherExceptionResponse weatherExceptionResponse = 
@@ -60,8 +60,7 @@ public class WeatherService {
 				logger.error("Calling " + Constants.WEATHER_API_URL + " for " + city + "and hardcoded ID from app returned unexpected exception", e);
 				throw new WeatherInternalException(HttpStatus.INTERNAL_SERVER_ERROR, "unexpected exception", e);
 			}
-        	
-        }
+        } 
 	}
 	
     private WeatherEntity convertWeatherResponseToWeatherEntity(WeatherResponse weatherResponse) {
