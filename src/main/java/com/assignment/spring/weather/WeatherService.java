@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.assignment.spring.utils.Constants;
+import com.assignment.spring.utils.LocalProperties;
 import com.assignment.spring.weather.api.WeatherExceptionResponse;
 import com.assignment.spring.weather.api.WeatherResponse;
 import com.assignment.spring.weather.exception.CityNotFoundException;
@@ -32,10 +34,13 @@ public class WeatherService {
     
     private final RestTemplate restTemplate;
     
+    private final LocalProperties localProperties;
+    
     @Autowired
-    public WeatherService(WeatherRepository weatherRepository, RestTemplate restTemplate) {
+    public WeatherService(WeatherRepository weatherRepository, RestTemplate restTemplate, LocalProperties localProperties) {
     	this.weatherRepository = weatherRepository;
     	this.restTemplate = restTemplate;
+    	this.localProperties = localProperties;
     }
 	
 	public WeatherEntity getWeather(String city) throws CityNotFoundException, WeatherInternalException {
@@ -43,7 +48,11 @@ public class WeatherService {
 //		String url = Constants.buildURL(Constants.WEATHER_API_URL, city, Constants.APP_ID);
 		try {
 			
-			ResponseEntity<WeatherResponse> response = restTemplate.getForEntity(Constants.WEATHER_API_URL, WeatherResponse.class,city, Constants.APP_ID);
+			ResponseEntity<WeatherResponse> response = restTemplate.getForEntity(
+					Constants.WEATHER_API_URL, 
+					WeatherResponse.class,city, 
+					localProperties.getAppId());
+//					environment.getProperty("appId"));
 			
 			if (logger.isDebugEnabled())
 			{
