@@ -18,7 +18,12 @@ import com.assignment.spring.weather.exception.CityNotFoundException;
 import com.assignment.spring.weather.exception.WeatherInternalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+/**
+ * Class for business logic of Weather related requests.
+ * 
+ * @author Mihaela Munteanu
+ * @since 7 sept. 2021
+ */
 @Service
 public class WeatherService {
 	private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
