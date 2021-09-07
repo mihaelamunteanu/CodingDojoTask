@@ -49,8 +49,8 @@ public class WeatherIntegrationWithPostgresTest {
     public void testOkCityInURL() 
     {
         ResponseEntity<WeatherEntity> responseEntity = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/weather/?city="+cityOk, WeatherEntity.class);
-        logger.debug("OK call response: " +responseEntity.toString());
+                .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityOk, WeatherEntity.class);
+        logger.debug("OK call response: " + responseEntity.toString());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseEntity.getBody().getCity().equalsIgnoreCase(cityOk));
         
@@ -59,8 +59,8 @@ public class WeatherIntegrationWithPostgresTest {
     @Test
     public void testNotOkCityInGetURL() {
         ResponseEntity<WeatherExceptionInfo> responseEntity = this.restTemplate
-            .getForEntity("http://localhost:" + port + "/api/v1/weather/?city="+cityNotOk, WeatherExceptionInfo.class);
-        logger.debug("NOT OK city call response: " +responseEntity.toString());
+            .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityNotOk, WeatherExceptionInfo.class);
+        logger.debug("NOT OK city call response: " + responseEntity.toString());
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals(HttpStatus.NOT_FOUND.value(), responseEntity.getBody().getCode());
     }
@@ -71,8 +71,19 @@ public class WeatherIntegrationWithPostgresTest {
     @Test
     public void testNotOkURLPath() {
         ResponseEntity<Object> responseEntity = this.restTemplate
-            .getForEntity("http://localhost:" + port + "/weather/?city="+cityOk, Object.class);
-        logger.debug("NOT OK path call response: " +responseEntity.toString());
+            .getForEntity("http://localhost:" + port + "/weather?city="+cityOk, Object.class);
+        logger.debug("NOT OK path call response: " + responseEntity.toString());
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
+    
+    /**
+     * Test with emtpy city /api/v1/weather?city=
+     */
+    @Test
+    public void testNotOkPathEmptyCityValue() {
+        ResponseEntity<Object> responseEntity = this.restTemplate
+            .getForEntity("http://localhost:" + port + "/api/v1/weather?city=", Object.class);
+        logger.debug("Empty city value call response: " + responseEntity.toString());
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 }

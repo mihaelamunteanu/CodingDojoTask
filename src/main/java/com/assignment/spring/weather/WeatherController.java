@@ -1,12 +1,10 @@
 package com.assignment.spring.weather;
 
-import javax.validation.constraints.NotBlank;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +17,7 @@ import com.assignment.spring.weather.exception.WeatherInternalException;
 
 @RestController
 @RequestMapping("api/v1/weather")
+@Validated
 public class WeatherController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WeatherController.class);
@@ -31,7 +30,7 @@ public class WeatherController {
     }
 
 	@GetMapping
-    public WeatherEntity getWeather(@RequestParam(required=true) @NotBlank String city) throws CityNotFoundException, WeatherInternalException {
+    public WeatherEntity getWeather(@RequestParam(required=true) String city) throws CityNotFoundException, WeatherInternalException {
 		return weatherService.getWeather(city);
     }
 	
@@ -45,6 +44,7 @@ public class WeatherController {
 	@ExceptionHandler(value = WeatherInternalException.class)
     public ResponseEntity<WeatherExceptionInfo> handleWeatherInternalException(WeatherInternalException weatherInternalException) {
 		logger.debug(weatherInternalException.getMessage());
-        return new ResponseEntity<WeatherExceptionInfo>(weatherInternalException.getWeatherExceptionInfo(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<WeatherExceptionInfo>(weatherInternalException.getWeatherExceptionInfo(), 
+        		weatherInternalException.getWeatherExceptionInfo().getStatus());
 	}	
 }

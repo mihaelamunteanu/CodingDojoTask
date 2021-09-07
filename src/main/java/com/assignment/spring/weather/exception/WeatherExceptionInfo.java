@@ -23,13 +23,6 @@ public class WeatherExceptionInfo {
 	private String message;
 	private String debugMessage;
 	
-	WeatherExceptionInfo(HttpStatus status, Throwable ex) {
-		this.code = status.value();
-		this.status = status;
-		this.message = "Unexpected error";
-		this.debugMessage = ex.getLocalizedMessage();
-	}
-
 	WeatherExceptionInfo(HttpStatus status, String message, Throwable ex) {
 		this.code = status.value();
 		this.status = status;

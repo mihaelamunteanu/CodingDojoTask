@@ -15,16 +15,6 @@ public class WeatherApplicationException extends Exception {
 	@Getter
 	private final WeatherExceptionInfo weatherExceptionInfo;
 
-	WeatherApplicationException(HttpStatus status) {
-		super();
-		weatherExceptionInfo =  new WeatherExceptionInfo(status, null);
-	}
-
-	WeatherApplicationException(HttpStatus status, Throwable ex) {
-		super(ex);
-		weatherExceptionInfo =  new WeatherExceptionInfo(status, "Unexpected error", ex);
-	}
-
 	WeatherApplicationException(HttpStatus status, String message, Throwable ex) {
 		super(message, ex);
 		weatherExceptionInfo =  new WeatherExceptionInfo(status, message, ex);

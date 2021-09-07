@@ -59,6 +59,10 @@ public class WeatherService {
 			try {
 				WeatherExceptionResponse weatherExceptionResponse = 
 						mapper.readValue(httpStatusException.getResponseBodyAsString(), WeatherExceptionResponse.class);
+				if (HttpStatus.BAD_REQUEST.equals(httpStatusException.getStatusCode())) {
+					logger.debug("City not provided or wrong format: " + weatherExceptionResponse);
+					throw new WeatherInternalException(HttpStatus.BAD_REQUEST, weatherExceptionResponse.getMessage(), httpStatusException); 
+				}
 				logger.debug("City not found with error: " + weatherExceptionResponse);
 				throw new CityNotFoundException(httpStatusException.getStatusCode(), weatherExceptionResponse.getMessage(), httpStatusException);
 			} catch (IOException e) {

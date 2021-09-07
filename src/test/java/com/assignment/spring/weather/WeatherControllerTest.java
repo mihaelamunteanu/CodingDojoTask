@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.HttpServerErrorException;
 
 import com.assignment.spring.weather.exception.CityNotFoundException;
+import com.assignment.spring.weather.exception.WeatherInternalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(WeatherController.class)
@@ -31,10 +32,12 @@ public class WeatherControllerTest {
     
     static final String CORRECT_PATH = "/api/v1/weather/";
     
+    static final String CITY_INTERNAL_ERROR = "New York"; 
     static final String CITY_OK = "Bucharest";
     static final String CITY_NOT_OK = "Parisjhadkas";
     
     static final String CITY_NOT_FOUND_MESSAGE = "city not found";
+    static final String UNEXPECTED_EXCEPTION = "unexpected exception";
     
     static final WeatherEntity WEATHER_ENTITY_RECORD1 = new WeatherEntity(1, CITY_OK, "RO", 212.4);
     static final WeatherEntity WEATHER_ENTITY_RECORD2 = new WeatherEntity(2, CITY_NOT_OK, "FR", 200.4);
@@ -53,10 +56,10 @@ public class WeatherControllerTest {
     }
     
     @Test
-    public void getWeather_failure() throws Exception {
+    public void getWeatherFailureCityNotFound() throws Exception {
         
         Mockito.when(weatherService.getWeather(CITY_NOT_OK)).thenThrow(
-        		new CityNotFoundException(HttpStatus.NOT_FOUND, "city not found", 
+        		new CityNotFoundException(HttpStatus.NOT_FOUND, CITY_NOT_FOUND_MESSAGE, 
         				new HttpServerErrorException( HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.name())));
         
         mockMvc.perform(MockMvcRequestBuilders
@@ -65,6 +68,26 @@ public class WeatherControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(CITY_NOT_FOUND_MESSAGE));
+    }
+    
+    /**
+     * Although request url is ok - a timeout could occur, or the url is not existent anymore etc.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void getWeatherFailureInternalError() throws Exception {
+        
+        Mockito.when(weatherService.getWeather(CITY_INTERNAL_ERROR)).thenThrow(
+        		new WeatherInternalException(HttpStatus.INTERNAL_SERVER_ERROR, UNEXPECTED_EXCEPTION, 
+        				new HttpServerErrorException( HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.name())));
+        
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(CORRECT_PATH)
+                .param("city", CITY_INTERNAL_ERROR)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value(UNEXPECTED_EXCEPTION));
     }
 
 }

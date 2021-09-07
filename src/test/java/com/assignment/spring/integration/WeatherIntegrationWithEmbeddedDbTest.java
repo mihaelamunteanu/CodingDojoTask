@@ -54,6 +54,13 @@ public class WeatherIntegrationWithEmbeddedDbTest
 		.andExpect(MockMvcResultMatchers.status().isNotFound());
 
 	}
+	
+	@Test
+	public void testWrongCityEmpty() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/weather?city="))
+		.andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+	}
 
     @Test
     public void nonExistentCityIntegration() throws Exception {
