@@ -50,14 +50,14 @@ public class WeatherControllerTest {
     @WithMockUser(username=USERNAME, password=PASSWORD)
     public void getWeather_success() throws Exception {
         
-        Mockito.when(weatherService.getWeather("Bucharest")).thenReturn(WEATHER_ENTITY_RECORD1);
+        Mockito.when(weatherService.getWeather(CITY_OK)).thenReturn(WEATHER_ENTITY_RECORD1);
         
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/v1/weather/")
-                .param("city", "Bucharest")
+                .param("city", CITY_OK)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-        		.andExpect(jsonPath("$.city").value("Bucharest"));
+        		.andExpect(jsonPath("$.city").value(CITY_OK));
     }
     
     @Test
@@ -95,6 +95,24 @@ public class WeatherControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value(UNEXPECTED_EXCEPTION));
+    }
+    
+    /**
+     * No user provided.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void getUnauthorized() throws Exception {
+        
+    	Mockito.when(weatherService.getWeather(CITY_OK)).thenReturn(WEATHER_ENTITY_RECORD1);
+        
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(CORRECT_PATH)
+                .param("city", CITY_OK)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").doesNotExist());
     }
 
 }
