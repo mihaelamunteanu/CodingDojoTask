@@ -1,8 +1,10 @@
 package com.assignment.spring.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.assignment.spring.Application;
+import com.assignment.spring.auth.User;
+import com.assignment.spring.auth.UserRepository;
 import com.assignment.spring.weather.WeatherEntity;
 import com.assignment.spring.weather.exception.WeatherExceptionInfo;
 
@@ -39,26 +43,48 @@ public class WeatherIntegrationWithPostgresTest {
 	public static final String cityOk = "Bucharest";
 	public static final String cityNotOk = "Pari23244";
 	
+	private static String USERNAME = "WeatherMan";
+	private static String PASSWORD = "root";
+	
     @LocalServerPort
     private int port;
  
     @Autowired
     private TestRestTemplate restTemplate;
+    
+    @Autowired
+    private UserRepository userRepository; 
  
-    @Test
+	@BeforeEach
+	public void before() {
+	    // because .withBasicAuth() creates a new TestRestTemplate with the same 
+	    // configuration as the autowired one.
+//	     restTemplate = restTemplate.withBasicAuth(USERNAME, PASSWORD);
+	     
+			if (userRepository.findAll() == null) {
+				final User user = new User();
+				user.setUserName(USERNAME);
+				user.setPassword(PASSWORD);
+				user.setLockedUser(false);
+				user.setActive(true);
+				userRepository.save(new User());
+			};
+	}
+
+	@Test
+//	@WithMockUser(username = "WeatherMan", password = "root")
     public void testOkCityInURL() 
     {
-        ResponseEntity<WeatherEntity> responseEntity = this.restTemplate
+        ResponseEntity<WeatherEntity> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
                 .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityOk, WeatherEntity.class);
         logger.debug("OK call response: " + responseEntity.toString());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody().getCity().equalsIgnoreCase(cityOk));
-        
+        assertTrue(responseEntity.getBody().getCity().equalsIgnoreCase(cityOk));        
     }
  
     @Test
     public void testNotOkCityInGetURL() {
-        ResponseEntity<WeatherExceptionInfo> responseEntity = this.restTemplate
+        ResponseEntity<WeatherExceptionInfo> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
             .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityNotOk, WeatherExceptionInfo.class);
         logger.debug("NOT OK city call response: " + responseEntity.toString());
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -70,7 +96,7 @@ public class WeatherIntegrationWithPostgresTest {
      */
     @Test
     public void testNotOkURLPath() {
-        ResponseEntity<Object> responseEntity = this.restTemplate
+        ResponseEntity<Object> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
             .getForEntity("http://localhost:" + port + "/weather?city="+cityOk, Object.class);
         logger.debug("NOT OK path call response: " + responseEntity.toString());
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -81,9 +107,20 @@ public class WeatherIntegrationWithPostgresTest {
      */
     @Test
     public void testNotOkPathEmptyCityValue() {
-        ResponseEntity<Object> responseEntity = this.restTemplate
+        ResponseEntity<Object> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
             .getForEntity("http://localhost:" + port + "/api/v1/weather?city=", Object.class);
         logger.debug("Empty city value call response: " + responseEntity.toString());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+    
+    /**
+     * Test with non existent Username
+     */
+    @Test
+    public void testWithBadCredentials() {
+        ResponseEntity<Object> responseEntity = this.restTemplate.withBasicAuth("wrongUser", PASSWORD)
+            .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityOk, Object.class);
+        logger.debug("Empty city value call response: " + responseEntity.toString());
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
     }
 }

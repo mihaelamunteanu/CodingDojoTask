@@ -1,6 +1,13 @@
 Spring Boot Coding Dojo
 ---
 
+#For running and accessing the application
+
+* **To be able to run the application a local.properties needs to be added under src/main/resources. The file should contain only:appId=<replaceWithApiKeyForWeather>**
+* **A user default user that can be used to access the endpoint has credetials: username ***WeatherMan***, pass ***root*** with basic authentication. **
+* **The endpoint is api/v1/weather?city={city} **
+
+
 Welcome to the Spring Boot Coding Dojo!
 
 ### Introduction
@@ -18,10 +25,13 @@ Make initial sources production-grade. For achieving this steps were taken for t
 * java doc and comments where considered
 * usage of additional libraries (see [pom.xml](/pom.xml))
 * usage of lombok for beans boiler plate
+* usage of flyway for db versioning
+* basic authentication
 
 ### Delivered the code
 
 A file local.properties containing appId=<yourWeatherApiKey> should be added so that the code can run.
+As git
 
 >**DO NOT create a Pull Request with your solution** 
 
@@ -34,10 +44,9 @@ By default this integration test is excluded (to be seen in pom.xml) so that it 
 It can be tested separately with **mvn -Dtest="com.assignment.spring.integration.*Test" test** 
 
 ##### Unit tests
-Unit tests tager
+Unit tests target
 * Controller Tests 
-* Service Tests
-* Exceptions are treated
+* Service Test
 
 
 ### Assumptions + additions + modifications
@@ -46,6 +55,11 @@ Unit tests tager
 
 * Path was added for identifying and version
 * RequestMapping annotation was replaced with GetMapping
+
+### Foreseen improvements
+* adding roles
+* oauth2 authentication and authorization
+* containerize application
 
 ### Footnote
 It's possible to generate the API key going to the [OpenWeather Sign up](https://openweathermap.org/appid) page.

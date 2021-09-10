@@ -1,11 +1,11 @@
 package com.assignment.spring.integration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.assignment.spring.auth.User;
+import com.assignment.spring.auth.UserRepository;
 import com.assignment.spring.weather.WeatherRepository;
 
 /**
@@ -36,26 +39,43 @@ import com.assignment.spring.weather.WeatherRepository;
 public class WeatherIntegrationWithEmbeddedDbTest 
 {
 	private static final Logger logger = LoggerFactory.getLogger(WeatherIntegrationWithEmbeddedDbTest.class);
+	
+	private static String USERNAME = "WeatherMan";
+	private static String PASSWORD = "root";
 
 	@Autowired
 	private WeatherRepository weatherRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Autowired
 	private MockMvc mockMvc;
 
-//	//@Before
-//	public void setup() {
-//		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-//	}
+	@BeforeEach
+	public void setup() {
+		if (userRepository.findByUserName(USERNAME) != null) {
+			final User user = new User();
+			user.setUserName(USERNAME);
+			user.setPassword(PASSWORD);
+			user.setLockedUser(false);
+			user.setActive(true);
+			userRepository.save(new User());
+		};
+
+	}
 
 	@Test
+	@WithMockUser(username = "WeatherMan", password = "root")
 	public void testWrongPathWithoutVersion() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.get("/weather?city=Paris"))
+//		.with(SecurityMockMvcRequestPostProcessors.httpBasic("WeatherMan", "root")))
 		.andExpect(MockMvcResultMatchers.status().isNotFound());
 
 	}
 	
 	@Test
+	@WithMockUser(username = "WeatherMan", password = "root")
 	public void testWrongCityEmpty() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/weather?city="))
 		.andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -63,6 +83,7 @@ public class WeatherIntegrationWithEmbeddedDbTest
 	}
 
     @Test
+	@WithMockUser(username = "WeatherMan", password = "root")
     public void nonExistentCityIntegration() throws Exception {
     	final long entriesNoBefore = weatherRepository.count();
 		mockMvc.perform(get("/api/v1/weather")
@@ -76,6 +97,7 @@ public class WeatherIntegrationWithEmbeddedDbTest
     }
 
 	@Test
+	@WithMockUser(username = "WeatherMan", password = "root")
 	void positiveTestIntegration() throws Exception {
 
 		MvcResult result = mockMvc.perform(get("/api/v1/weather")

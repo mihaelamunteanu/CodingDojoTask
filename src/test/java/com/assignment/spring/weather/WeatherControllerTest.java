@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.HttpServerErrorException;
@@ -42,7 +43,11 @@ public class WeatherControllerTest {
     static final WeatherEntity WEATHER_ENTITY_RECORD1 = new WeatherEntity(1, CITY_OK, "RO", 212.4);
     static final WeatherEntity WEATHER_ENTITY_RECORD2 = new WeatherEntity(2, CITY_NOT_OK, "FR", 200.4);
     
+	private static final String USERNAME = "WeatherMan";
+	private static final String PASSWORD = "root";
+	
     @Test
+    @WithMockUser(username=USERNAME, password=PASSWORD)
     public void getWeather_success() throws Exception {
         
         Mockito.when(weatherService.getWeather("Bucharest")).thenReturn(WEATHER_ENTITY_RECORD1);
@@ -56,6 +61,7 @@ public class WeatherControllerTest {
     }
     
     @Test
+    @WithMockUser(username=USERNAME, password=PASSWORD)
     public void getWeatherFailureCityNotFound() throws Exception {
         
         Mockito.when(weatherService.getWeather(CITY_NOT_OK)).thenThrow(
@@ -76,6 +82,7 @@ public class WeatherControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username=USERNAME, password=PASSWORD)
     public void getWeatherFailureInternalError() throws Exception {
         
         Mockito.when(weatherService.getWeather(CITY_INTERNAL_ERROR)).thenThrow(

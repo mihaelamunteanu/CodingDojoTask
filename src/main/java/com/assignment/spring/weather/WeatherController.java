@@ -47,4 +47,5 @@ public class WeatherController {
         return new ResponseEntity<WeatherExceptionInfo>(weatherInternalException.getWeatherExceptionInfo(), 
         		weatherInternalException.getWeatherExceptionInfo().getStatus());
 	}	
+	
 }
