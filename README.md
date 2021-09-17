@@ -4,7 +4,7 @@ Welcome to the Spring Boot Coding Dojo!
 
 ### For running and accessing the application
 
-To be able to run the application a *local.properties* needs to be added under *src/main/resources*. The file should contain only:*appId=<replaceWithApiKeyForWeather>*
+To be able to run the application a *local.properties* needs to be added under *src/main/resources*. The file should contain only:*appId=<replaceWithApiKeyForWeather>* (as it is not ok to expose the api key)
 
 A default user that can be used to access the endpoint has credetials: username **WeatherMan**, pass **root** with basic authentication. **
 
@@ -19,7 +19,7 @@ This is a simple application that requests its data from [OpenWeather](https://o
 
 Make initial sources production-grade. For achieving this steps were taken for the following aspects: 
 * logging
-* testing (unit tests and integration with embedded and regular postgres db)
+* testing (unit tests and integration with embedded db and db test postgres)
 * exception handling
 * code refactoring (e.g. for having a Service layer for business logic, externalize the apiKey not to expose it, exception hierarchy)
 * validation (in this case minimal validation was added)
@@ -29,14 +29,7 @@ Make initial sources production-grade. For achieving this steps were taken for t
 * usage of flyway for db versioning
 * basic authentication
 
-### Delivered the code
-
-A file local.properties containing appId=<yourWeatherApiKey> should be added so that the code can run.
-As git
-
->**DO NOT create a Pull Request with your solution** 
-
-
+ 
 #### Tests
 ##### Integration Tests
 A smoke (end-to-end) integration test is done for a test database (not embedded). 
@@ -61,7 +54,7 @@ RequestMapping annotation was replaced with GetMapping
 ### Foreseen improvements
 * adding roles
 * oauth2 authentication and authorization
-* containerize application
+* containerize application with configuration in dockerfile 
 * documentation
 
 ### Footnote

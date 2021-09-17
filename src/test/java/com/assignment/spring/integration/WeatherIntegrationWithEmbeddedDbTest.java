@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.assignment.spring.auth.User;
 import com.assignment.spring.auth.UserRepository;
+import com.assignment.spring.utils.WeatherMessages;
 import com.assignment.spring.weather.WeatherRepository;
 
 /**
@@ -104,10 +105,8 @@ public class WeatherIntegrationWithEmbeddedDbTest
 				.contentType("application/json")
 				.param("city", "Bucharest"))
 		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.id").value("1"))
-		.andExpect(jsonPath("$.city").value("Bucharest"))
-		.andExpect(jsonPath("$.country").value("RO"))
-		.andExpect(jsonPath("$.temperature").exists())
+		.andExpect(jsonPath("$.weatherId").value("1"))
+		.andExpect(jsonPath("$.statusMessage").value(WeatherMessages.ENTRY_CREATED_SUCCESSFULLY.getMessage()))
 		.andReturn();
 		
 		logger.info("Positive integration test -" + result.getResponse().toString());

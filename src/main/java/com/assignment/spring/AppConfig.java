@@ -14,8 +14,8 @@ public class AppConfig {
         return new RestTemplate();
     }
     
-    @Bean
-    public LocalProperties loadLocalProperties() {
-    	return new LocalProperties();
-    }
+//    @Bean - no need as it already is marked as component
+//    public LocalProperties loadLocalProperties() {
+//    	return new LocalProperties();
+//    }
 }

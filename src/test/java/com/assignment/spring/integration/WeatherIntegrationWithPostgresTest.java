@@ -17,10 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.assignment.spring.Application;
+import com.assignment.spring.CodingDojoApp;
 import com.assignment.spring.auth.User;
 import com.assignment.spring.auth.UserRepository;
+import com.assignment.spring.weather.WeatherDojoResponse;
 import com.assignment.spring.weather.WeatherEntity;
+import com.assignment.spring.weather.WeatherRepository;
 import com.assignment.spring.weather.exception.WeatherExceptionInfo;
 
 /**
@@ -34,7 +36,7 @@ import com.assignment.spring.weather.exception.WeatherExceptionInfo;
  * @author Mihaela Munteanu
  * @since 6 sept. 2021
  */
-@SpringBootTest(classes = Application.class, 
+@SpringBootTest(classes = CodingDojoApp.class, 
 webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/app_test_with_postgres_db.properties")
 public class WeatherIntegrationWithPostgresTest {
@@ -54,6 +56,11 @@ public class WeatherIntegrationWithPostgresTest {
     
     @Autowired
     private UserRepository userRepository; 
+    
+    @Autowired
+    private WeatherRepository weatherRepository;
+
+	private long obj; 
  
 	@BeforeEach
 	public void before() {
@@ -75,11 +82,12 @@ public class WeatherIntegrationWithPostgresTest {
 //	@WithMockUser(username = "WeatherMan", password = "root")
     public void testOkCityInURL() 
     {
-        ResponseEntity<WeatherEntity> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
-                .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityOk, WeatherEntity.class);
+		long entriesNo = weatherRepository.count();
+        ResponseEntity<WeatherDojoResponse> responseEntity = this.restTemplate.withBasicAuth(USERNAME, PASSWORD)
+                .getForEntity("http://localhost:" + port + "/api/v1/weather?city="+cityOk, WeatherDojoResponse.class);
         logger.debug("OK call response: " + responseEntity.toString());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody().getCity().equalsIgnoreCase(cityOk));        
+		assertTrue(responseEntity.getBody().getWeatherId().equals(Long.valueOf(entriesNo).intValue()+1));        
     }
  
     @Test

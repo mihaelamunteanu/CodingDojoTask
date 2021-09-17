@@ -5,14 +5,12 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import com.assignment.spring.utils.Constants;
 import com.assignment.spring.utils.LocalProperties;
 import com.assignment.spring.weather.api.WeatherExceptionResponse;
 import com.assignment.spring.weather.api.WeatherResponse;
@@ -43,25 +41,23 @@ public class WeatherService {
     	this.localProperties = localProperties;
     }
 	
-	public WeatherEntity getWeather(String city) throws CityNotFoundException, WeatherInternalException {
+	public WeatherDojoResponse getWeather(String city) throws CityNotFoundException, WeatherInternalException {
 		final WeatherEntity weatherEntity;
 //		String url = Constants.buildURL(Constants.WEATHER_API_URL, city, Constants.APP_ID);
 		try {
 			
 			ResponseEntity<WeatherResponse> response = restTemplate.getForEntity(
-					Constants.WEATHER_API_URL, 
+					localProperties.getWeatherApi(), 
 					WeatherResponse.class,city, 
 					localProperties.getAppId());
 //					environment.getProperty("appId"));
 			
-			if (logger.isDebugEnabled())
-			{
-				logger.debug("Trying to call repository save for weatherInfo which extends Weather Entity: " + response.getBody());
-			}
-			logger.info("Trying to call repository save for weatherInfo which extends Weather Entity: " + response.getBody());
+			logger.debug("Trying to call repository save for weatherInfo which extends Weather Entity: " + response.getBody().getName());
 			
 			weatherEntity = convertWeatherResponseToWeatherEntity(response.getBody());
-			return weatherRepository.save(weatherEntity);
+			WeatherEntity weatherEntitySaved = weatherRepository.save(weatherEntity);
+			
+			return new WeatherDojoResponse(weatherEntitySaved.getId());
 			
 		} catch (HttpStatusCodeException httpStatusException) {//HttpServerErrorException | HttpClientErrorException
 			ObjectMapper mapper = new ObjectMapper();
@@ -75,7 +71,7 @@ public class WeatherService {
 				logger.debug("City not found with error: " + weatherExceptionResponse);
 				throw new CityNotFoundException(httpStatusException.getStatusCode(), weatherExceptionResponse.getMessage(), httpStatusException);
 			} catch (IOException e) {
-				logger.error("Calling " + Constants.WEATHER_API_URL + " for " + city + "and hardcoded ID from app returned unexpected exception", e);
+				logger.error(String.format("Calling %s for %s and hardcoded ID from app returned unexpected exception", localProperties.getWeatherApi(), city), e);
 				throw new WeatherInternalException(HttpStatus.INTERNAL_SERVER_ERROR, "unexpected exception", e);
 			}
         } 

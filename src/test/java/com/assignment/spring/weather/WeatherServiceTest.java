@@ -16,8 +16,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.assignment.spring.utils.Constants;
 import com.assignment.spring.utils.LocalProperties;
+import com.assignment.spring.utils.TestConstants;
+import com.assignment.spring.utils.WeatherMessages;
 import com.assignment.spring.weather.api.Main;
 import com.assignment.spring.weather.api.Sys;
 import com.assignment.spring.weather.api.WeatherExceptionResponse;
@@ -76,16 +77,16 @@ public class WeatherServiceTest {
     	weatherResponse.setSys(sys);
     	weatherResponse.setName(CITY_OK);
     	
-    	Mockito.when(localProperties.getAppId()).thenReturn(Constants.APP_ID);
-    	Mockito.when(restTemplate.getForEntity(Constants.WEATHER_API_URL, WeatherResponse.class, CITY_OK, Constants.APP_ID))
+    	Mockito.when(localProperties.getAppId()).thenReturn(TestConstants.APP_ID);
+    	Mockito.when(localProperties.getWeatherApi()).thenReturn(TestConstants.WEATHER_API_URL); 
+    	Mockito.when(restTemplate.getForEntity(TestConstants.WEATHER_API_URL, WeatherResponse.class, CITY_OK, TestConstants.APP_ID))
     	.thenReturn(new ResponseEntity<WeatherResponse>(weatherResponse, HttpStatus.OK));
         Mockito.when(weatherRepository.save(WEATHER_ENTITY_RECORD_WITHOUT_ID)).thenReturn(WEATHER_ENTITY_RECORD_RETURNED_WITH_ID);
         
         //test service method getWeather
-        WeatherEntity weatherEntity = weatherService.getWeather(CITY_OK);
-        assertNotNull(weatherEntity);
-        assertEquals(CITY_OK, weatherEntity.getCity());
-        assertEquals(COUNTRY, weatherEntity.getCountry());
+        WeatherDojoResponse weatherDojoResponse = weatherService.getWeather(CITY_OK);
+        assertNotNull(weatherDojoResponse);
+        assertEquals(WeatherMessages.ENTRY_CREATED_SUCCESSFULLY.getMessage(), weatherDojoResponse.getStatusMessage());
     }
     
     @Test
@@ -99,8 +100,9 @@ public class WeatherServiceTest {
     	HttpServerErrorException httpErrorException = new HttpServerErrorException(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.name(), 
     			NOT_FOUND_RESPONSE.getBytes() , null);
     	
-    	Mockito.when(localProperties.getAppId()).thenReturn(Constants.APP_ID);    	
-    	Mockito.when(restTemplate.getForEntity(Constants.WEATHER_API_URL, WeatherResponse.class, CITY_NOT_OK, Constants.APP_ID))
+    	Mockito.when(localProperties.getAppId()).thenReturn(TestConstants.APP_ID);   
+    	Mockito.when(localProperties.getWeatherApi()).thenReturn(TestConstants.WEATHER_API_URL); 
+    	Mockito.when(restTemplate.getForEntity(TestConstants.WEATHER_API_URL, WeatherResponse.class, CITY_NOT_OK, TestConstants.APP_ID))
     	.thenThrow(httpErrorException);
 
     	CityNotFoundException thrownException = null;
@@ -122,8 +124,9 @@ public class WeatherServiceTest {
     	HttpServerErrorException httpErrorException = new HttpServerErrorException(
     			HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.name());
     	
-    	Mockito.when(localProperties.getAppId()).thenReturn(Constants.APP_ID);
-    	Mockito.when(restTemplate.getForEntity(Constants.WEATHER_API_URL, WeatherResponse.class, CITY_INTERNAL_ERROR, Constants.APP_ID))
+    	Mockito.when(localProperties.getAppId()).thenReturn(TestConstants.APP_ID);
+    	Mockito.when(localProperties.getWeatherApi()).thenReturn(TestConstants.WEATHER_API_URL); 
+    	Mockito.when(restTemplate.getForEntity(TestConstants.WEATHER_API_URL, WeatherResponse.class, CITY_INTERNAL_ERROR, TestConstants.APP_ID))
     	.thenThrow(httpErrorException);
 
     	WeatherInternalException thrownException = null;

@@ -40,8 +40,8 @@ public class WeatherControllerTest {
     static final String CITY_NOT_FOUND_MESSAGE = "city not found";
     static final String UNEXPECTED_EXCEPTION = "unexpected exception";
     
-    static final WeatherEntity WEATHER_ENTITY_RECORD1 = new WeatherEntity(1, CITY_OK, "RO", 212.4);
-    static final WeatherEntity WEATHER_ENTITY_RECORD2 = new WeatherEntity(2, CITY_NOT_OK, "FR", 200.4);
+    static final WeatherDojoResponse WEATHER_ENTITY_RECORD1 = new WeatherDojoResponse(1);
+    static final WeatherDojoResponse WEATHER_ENTITY_RECORD2 = new WeatherDojoResponse(2);
     
 	private static final String USERNAME = "WeatherMan";
 	private static final String PASSWORD = "root";
@@ -57,7 +57,7 @@ public class WeatherControllerTest {
                 .param("city", CITY_OK)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-        		.andExpect(jsonPath("$.city").value(CITY_OK));
+        		.andExpect(jsonPath("$.weatherId").value(1));
     }
     
     @Test
